@@ -29,6 +29,11 @@ body {
 }
 
 @keyframes scroll-up {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+@keyframes scroll-left-mobile {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-816px); }
 }

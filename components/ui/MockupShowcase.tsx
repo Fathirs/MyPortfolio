@@ -25,7 +25,6 @@ const M_H   = 174;
 const M_PAD = 5.836;   // exact from Figma
 const M_BR  = 11.671;  // exact from Figma
 const M_GAP = 12;
-const LOOP_OFFSET = 3 * M_W + 3 * M_GAP; // 816px
 
 const allCardsH = [...cards, ...cards]; // 6 total — 3 base + 3 duplicate
 
@@ -90,18 +89,7 @@ export default function MockupShowcase() {
 
   return (
     <>
-      <style>{`
-        @keyframes scroll-up {
-          from { transform: translateY(0); }
-          to   { transform: translateY(-50%); }
-        }
-        @keyframes scroll-left-mobile {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-${LOOP_OFFSET}px); }
-        }
-      `}</style>
-
-      {/* ── Desktop — vertical scroll, untouched ── */}
+      {/* ── Desktop — vertical scroll ── */}
       <div className="hidden lg:flex w-full justify-end items-center">
         <div
           className="relative overflow-hidden w-full lg:w-auto"

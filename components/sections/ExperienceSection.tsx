@@ -88,11 +88,11 @@ Built strong foundations in commercial design thinking, stakeholder communicatio
 ];
 
 // ── Shared styles ──────────────────────────────────────────────────────────────
-const cardStyle: React.CSSProperties = {
+const CARD_STYLE: React.CSSProperties = {
   background: "#ffffff",
   boxShadow: "0px 0px 9px 0px rgba(148,148,148,0.25)",
 };
-const hdrBorder: React.CSSProperties = { borderColor: "#b6b6b6" };
+const HDR_BORDER: React.CSSProperties = { borderColor: "#b6b6b6" };
 
 // ── Desktop component ──────────────────────────────────────────────────────────
 function DesktopExperience({ experiences }: { experiences: SanityExperience[] }) {
@@ -101,145 +101,92 @@ function DesktopExperience({ experiences }: { experiences: SanityExperience[] })
   const [displayIndex, setDisplayIndex] = useState(0);
   const [fading, setFading] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const fadeTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Scroll-driven index
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
       const rect = sectionRef.current.getBoundingClientRect();
-      const scrolled = -rect.top;
-      const scrollable = rect.height - window.innerHeight;
-      const progress = Math.max(0, Math.min(1, scrolled / scrollable));
-      const index = Math.min(N - 1, Math.floor(progress * N));
-      setActiveIndex(index);
+      const progress = Math.max(0, Math.min(1, -rect.top / (rect.height - window.innerHeight)));
+      setActiveIndex(Math.min(N - 1, Math.floor(progress * N)));
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [N]);
 
+  // Fade transition on index change
   useEffect(() => {
     if (activeIndex === displayIndex) return;
+    if (fadeTimer.current) clearTimeout(fadeTimer.current);
     setFading(true);
-    const t = setTimeout(() => {
+    fadeTimer.current = setTimeout(() => {
       setDisplayIndex(activeIndex);
       setFading(false);
     }, 160);
-    return () => clearTimeout(t);
+    return () => { if (fadeTimer.current) clearTimeout(fadeTimer.current); };
   }, [activeIndex, displayIndex]);
 
   const active = experiences[displayIndex];
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative dot-pattern hidden lg:block"
-      style={{ height: `${(N + 1) * 100}vh` }}
-    >
+    <section ref={sectionRef} className="relative dot-pattern hidden lg:block" style={{ height: `${(N + 1) * 100}vh` }}>
       <div className="sticky top-[100px] h-[calc(100vh-100px)] flex items-center justify-center px-8">
         <div className="flex items-start gap-[24px]">
 
           {/* Left card — timeline */}
-          <div className="flex flex-col pb-[12px] pt-[7.5px] rounded-[12px] overflow-hidden w-[581px]" style={cardStyle}>
-            <div className="flex items-center border-b pb-[7.5px] pt-[1.5px] px-[18px] mb-[9px]" style={hdrBorder}>
-              <p className="text-[19.5px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>
-                Work of Experiences
-              </p>
+          <div className="flex flex-col pb-[12px] pt-[7.5px] rounded-[12px] overflow-hidden w-[581px]" style={CARD_STYLE}>
+            <div className="flex items-center border-b pb-[7.5px] pt-[1.5px] px-[18px] mb-[9px]" style={HDR_BORDER}>
+              <p className="text-[19.5px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>Work of Experiences</p>
             </div>
-
             <div className="flex flex-col px-[18px]">
               {experiences.map((exp, i) => (
                 <div key={exp._id} className="flex items-start gap-[10px]">
-
                   {/* Stepper */}
                   <div className="flex flex-col items-center self-stretch shrink-0 w-[12px]">
                     <div className="h-[11px] shrink-0" />
-                    <div
-                      className="w-[9px] h-[9px] rounded-full shrink-0 transition-colors duration-300"
-                      style={{ background: i === activeIndex ? "#0e0e16" : "#d0d0d0" }}
-                    />
-                    {i < N - 1 && (
-                      <div className="w-[1px] flex-1 mt-[5px]" style={{ background: "#e8e8e8" }} />
-                    )}
+                    <div className="w-[9px] h-[9px] rounded-full shrink-0 transition-colors duration-300" style={{ background: i === activeIndex ? "#0e0e16" : "#d0d0d0" }} />
+                    {i < N - 1 && <div className="w-[1px] flex-1 mt-[5px]" style={{ background: "#e8e8e8" }} />}
                   </div>
-
                   {/* Content */}
                   <div className={`flex-1 min-w-0 flex flex-col gap-[6px] ${i < N - 1 ? "pb-[18px]" : ""}`}>
                     <div className="flex items-center justify-between gap-[6px]">
-                      <p
-                        className="text-[18px] font-medium leading-[1.5] transition-all duration-300"
-                        style={{ color: i === activeIndex ? "#0e0e16" : "#c0c0c0" }}
-                      >
+                      <p className="text-[18px] font-medium leading-[1.5] transition-all duration-300" style={{ color: i === activeIndex ? "#0e0e16" : "#c0c0c0" }}>
                         {exp.role} — {exp.company}
                       </p>
-                      <div
-                        className={`shrink-0 transition-all duration-300 ${
-                          i === activeIndex ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1 pointer-events-none"
-                        }`}
-                      >
-                        <div
-                          className="flex items-center justify-center rounded-[8px] w-[26px] h-[27px]"
-                          style={{
-                            background: "#ffffff",
-                            border: "1px solid #ececec",
-                            boxShadow: "0px 0px 4px 0px rgba(0,0,0,0.25)",
-                          }}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" strokeWidth="2.5" style={{ stroke: "#0e0e16" }}>
-                            <polyline points="9 18 15 12 9 6" />
-                          </svg>
-                        </div>
+                      <div className={`shrink-0 transition-all duration-300 ${i === activeIndex ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1 pointer-events-none"}`}>
+                        <ChevronBadge direction="right" />
                       </div>
                     </div>
-
                     <div className="flex items-center gap-[12px]">
-                      <span className="text-[16px] leading-[1.5]" style={{ color: "#696969" }}>
-                        {exp.location}
-                      </span>
+                      <span className="text-[16px] leading-[1.5]" style={{ color: "#696969" }}>{exp.location}</span>
                       <span className="w-[5px] h-[5px] rounded-full shrink-0" style={{ background: "#d0d0d0" }} />
-                      <span className="text-[16px] leading-[1.5]" style={{ color: "#696969" }}>
-                        {exp.period}
-                      </span>
+                      <span className="text-[16px] leading-[1.5]" style={{ color: "#696969" }}>{exp.period}</span>
                     </div>
                   </div>
-
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right card — description */}
-          <div className="flex flex-col pb-[12px] pt-[7.5px] rounded-[12px] overflow-hidden w-[539px]" style={cardStyle}>
-            <div className="flex items-center border-b pb-[7.5px] pt-[1.5px] px-[18px] mb-[9px]" style={hdrBorder}>
-              <p className="text-[19.5px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>
-                Description &amp; Metrix
-              </p>
+          <div className="flex flex-col pb-[12px] pt-[7.5px] rounded-[12px] overflow-hidden w-[539px]" style={CARD_STYLE}>
+            <div className="flex items-center border-b pb-[7.5px] pt-[1.5px] px-[18px] mb-[9px]" style={HDR_BORDER}>
+              <p className="text-[19.5px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>Description &amp; Metrix</p>
             </div>
-
             <div className="flex items-start px-[18px]">
               <div className="flex flex-col items-center self-stretch shrink-0 w-[12px] mr-[10px]">
                 <div className="h-[11px] shrink-0" />
                 <div className="w-[9px] h-[9px] rounded-full shrink-0" style={{ background: "#0e0e16" }} />
                 <div className="w-[1px] flex-1 mt-[5px]" style={{ background: "#e8e8e8" }} />
               </div>
-
-              <div
-                className="flex-1 min-w-0 flex flex-col gap-[8px] transition-all duration-300"
-                style={{
-                  opacity: fading ? 0 : 1,
-                  transform: fading ? "translateY(5px)" : "translateY(0)",
-                }}
-              >
+              <div className="flex-1 min-w-0 flex flex-col gap-[8px] transition-all duration-300" style={{ opacity: fading ? 0 : 1, transform: fading ? "translateY(5px)" : "translateY(0)" }}>
                 <div className="flex flex-col">
-                  <p className="text-[18px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>
-                    {active.role} — {active.company}
-                  </p>
-                  <p className="text-[16px] leading-[1.5]" style={{ color: "#696969" }}>
-                    {active.location} • {active.period}
-                  </p>
+                  <p className="text-[18px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>{active.role} — {active.company}</p>
+                  <p className="text-[16px] leading-[1.5]" style={{ color: "#696969" }}>{active.location} • {active.period}</p>
                 </div>
-                <p className="text-[14px] leading-[1.5] whitespace-pre-wrap" style={{ color: "#606060" }}>
-                  {active.description}
-                </p>
+                <p className="text-[14px] leading-[1.5] whitespace-pre-wrap" style={{ color: "#606060" }}>{active.description}</p>
               </div>
             </div>
           </div>
@@ -264,129 +211,80 @@ function MobileExperience({ experiences }: { experiences: SanityExperience[] }) 
   return (
     <section className="lg:hidden dot-pattern py-[40px] border-b border-dashed" style={{ borderColor: "#d9d9d9" }}>
       <div className="px-4">
-        <div
-          className="rounded-[12px] flex flex-col pb-[12px] pt-[7.5px]"
-          style={cardStyle}
-        >
-          {/* Header */}
-          <div
-            className="flex items-center border-b pb-[7.5px] pt-[1.5px] px-[18px] mb-[12px]"
-            style={hdrBorder}
-          >
-            <p className="text-[19.5px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>
-              Work of Experiences
-            </p>
+        <div className="rounded-[12px] flex flex-col pb-[12px] pt-[7.5px]" style={CARD_STYLE}>
+          <div className="flex items-center border-b pb-[7.5px] pt-[1.5px] px-[18px] mb-[12px]" style={HDR_BORDER}>
+            <p className="text-[19.5px] font-medium leading-[1.5]" style={{ color: "#0e0e16" }}>Work of Experiences</p>
           </div>
-
-          {/* Experience cards */}
           <div className="flex flex-col gap-[12px] px-[18px]">
             {experiences.map((exp, i) => {
               const isOpen = openIndex === i;
               const isExpanded = readMoreIndex === i;
-
               return (
-                <div
-                  key={exp._id}
-                  className="bg-white rounded-[12px] flex flex-col"
-                  style={{
-                    border: "1px solid #ebebeb",
-                    boxShadow: "0px 0px 9px 0px rgba(148,148,148,0.25)",
-                    paddingTop: "7.5px",
-                    paddingBottom: isOpen ? "12px" : "6px",
-                    transition: "padding-bottom 300ms ease",
-                  }}
-                >
-                  {/* Card header */}
+                <div key={exp._id} className="bg-white rounded-[12px] flex flex-col" style={{
+                  border: "1px solid #ebebeb",
+                  boxShadow: "0px 0px 9px 0px rgba(148,148,148,0.25)",
+                  paddingTop: "7.5px",
+                  paddingBottom: isOpen ? "12px" : "6px",
+                  transition: "padding-bottom 300ms ease",
+                }}>
                   <div className="flex flex-col gap-[8px] px-[16px]">
-                    {/* Role row + chevron */}
                     <div className="flex flex-col gap-[4px]">
                       <div className="flex items-center gap-[7.5px]">
-                        <p
-                          className="flex-1 min-w-0 text-[16px] font-medium leading-[1.5] truncate"
-                          style={{ color: "#0e0e16" }}
-                        >
-                          {exp.role}
-                        </p>
-                        <button
-                          onClick={() => toggleOpen(i)}
-                          className="shrink-0 flex items-center justify-center rounded-[8px]"
-                          style={{
-                            width: 26,
-                            height: 27,
-                            background: "#ffffff",
-                            border: "1px solid #f5f5f5",
-                            boxShadow: "0px 0px 4px 0px rgba(0,0,0,0.25)",
-                          }}
-                        >
-                          <svg
-                            width="14" height="14" viewBox="0 0 24 24" fill="none" strokeWidth="2.5"
-                            style={{ stroke: "#0e0e16" }}
-                            className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-                          >
-                            <polyline points="6 9 12 15 18 9" />
-                          </svg>
+                        <p className="flex-1 min-w-0 text-[16px] font-medium leading-[1.5] truncate" style={{ color: "#0e0e16" }}>{exp.role}</p>
+                        <button onClick={() => toggleOpen(i)} className="shrink-0 flex items-center justify-center">
+                          <ChevronBadge direction={isOpen ? "down-open" : "down"} />
                         </button>
                       </div>
-                      {/* Company */}
-                      <p className="text-[14px] leading-[1.5]" style={{ color: "#9a9a9a" }}>
-                        {exp.company}
-                      </p>
+                      <p className="text-[14px] leading-[1.5]" style={{ color: "#9a9a9a" }}>{exp.company}</p>
                     </div>
-
-                    {/* Location + Period */}
-                    <p className="text-[14px] leading-[1.5]" style={{ color: "#696969" }}>
-                      {exp.location} {exp.period}
-                    </p>
+                    <p className="text-[14px] leading-[1.5]" style={{ color: "#696969" }}>{exp.location} {exp.period}</p>
                   </div>
-
-                  {/* Description — expands when open */}
-                  <div
-                    className="overflow-hidden transition-all duration-300"
-                    style={{
-                      maxHeight: isOpen ? "800px" : "0px",
-                      paddingLeft: 16,
-                      paddingRight: 16,
-                      marginTop: isOpen ? 8 : 0,
-                      transition: "max-height 300ms ease, margin-top 300ms ease",
-                    }}
-                  >
-                    <p
-                      className="text-[12px] leading-[1.5]"
-                      style={{
-                        color: "#636363",
-                        whiteSpace: "pre-wrap",
-                        ...(isExpanded ? {} : {
-                          display: "-webkit-box",
-                          WebkitLineClamp: 8,
-                          WebkitBoxOrient: "vertical" as const,
-                          overflow: "hidden",
-                        }),
-                      }}
-                    >
+                  <div className="overflow-hidden transition-all duration-300" style={{
+                    maxHeight: isOpen ? "800px" : "0px",
+                    paddingLeft: 16, paddingRight: 16,
+                    marginTop: isOpen ? 8 : 0,
+                    transition: "max-height 300ms ease, margin-top 300ms ease",
+                  }}>
+                    <p className="text-[12px] leading-[1.5]" style={{
+                      color: "#636363", whiteSpace: "pre-wrap",
+                      ...(isExpanded ? {} : { display: "-webkit-box", WebkitLineClamp: 8, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }),
+                    }}>
                       {exp.description}
                     </p>
                     {!isExpanded && (
-                      <button
-                        className="text-[12px] font-semibold mt-[2px]"
-                        style={{ color: "#0e0e16" }}
-                        onClick={() => setReadMoreIndex(i)}
-                      >
-                        Read More
-                      </button>
+                      <button className="text-[12px] font-semibold mt-[2px]" style={{ color: "#0e0e16" }} onClick={() => setReadMoreIndex(i)}>Read More</button>
                     )}
                   </div>
                 </div>
               );
             })}
           </div>
-
         </div>
       </div>
     </section>
   );
 }
 
-// ── Default export — composes both ────────────────────────────────────────────
+// ── Shared chevron badge ─────────────────────────────────────────────────────
+function ChevronBadge({ direction }: { direction: "right" | "down" | "down-open" }) {
+  const points = direction === "right" ? "9 18 15 12 9 6" : "6 9 12 15 18 9";
+  return (
+    <div className="flex items-center justify-center rounded-[8px] w-[26px] h-[27px]" style={{
+      background: "#ffffff",
+      border: direction === "right" ? "1px solid #ececec" : "1px solid #f5f5f5",
+      boxShadow: "0px 0px 4px 0px rgba(0,0,0,0.25)",
+    }}>
+      <svg
+        width="14" height="14" viewBox="0 0 24 24" fill="none" strokeWidth="2.5" style={{ stroke: "#0e0e16" }}
+        className={direction === "down-open" ? "transition-transform duration-200 rotate-180" : "transition-transform duration-200"}
+      >
+        <polyline points={points} />
+      </svg>
+    </div>
+  );
+}
+
+// ── Default export ────────────────────────────────────────────────────────────
 export default function ExperienceSection({ experiences }: { experiences?: SanityExperience[] }) {
   const data = experiences && experiences.length > 0 ? experiences : DEFAULT_EXPERIENCES;
   return (
