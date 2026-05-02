@@ -82,7 +82,7 @@ function DesktopAbout({ boldIntro, para1Rest, para2, para3 }: {
             style={{ boxShadow: "0px 0px 12px 0px rgba(148,148,148,0.25)" }}
           >
             {/* Header */}
-            <div className="flex items-center border-b border-[#b6b6b6] pb-[10px] pt-[2px] px-[24px]">
+            <div className="flex items-center border-b border-[#ececec] px-[24px] py-[10px]">
               <p className="text-[22px] font-medium text-black leading-[1.5]">About me</p>
             </div>
 
@@ -129,7 +129,7 @@ function MobileAbout({ boldIntro, para1Rest, para2, para3 }: {
           className="bg-white w-full rounded-[16px] flex flex-col gap-[12px] overflow-hidden"
           style={{ boxShadow: "0px 0px 12px 0px rgba(148,148,148,0.25)" }}
         >
-          <div className="flex items-center border-b border-[#b6b6b6] pb-[10px] pt-[2px] px-[24px]">
+          <div className="flex items-center border-b border-[#ececec] px-[24px] py-[10px]">
             <p className="text-[20px] font-medium text-black leading-[1.5]">About me</p>
           </div>
           <div className="px-[24px] pb-[10px]" style={{ letterSpacing: "-0.32px" }}>

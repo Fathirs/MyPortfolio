@@ -10,10 +10,18 @@ import {
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
-function ArrowRightIcon() {
+function ArrowRightIcon({ color = "#ffffff" }: { color?: string }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
-      <path d="M6 3L11 8L6 13" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 3L11 8L6 13" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon({ color = "#414651" }: { color?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+      <path d="M10 3L5 8L10 13" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -69,7 +77,7 @@ function PressableLink({ href, className = "", target, bg, border, shadows, chil
 
 type BtnProps = { href: string; label?: string; className?: string; target?: string };
 
-export function PrimaryButton({ href, label = "See My Project", className, target }: BtnProps) {
+export function PrimaryButton({ href, label = "See My Projects", className, target }: BtnProps) {
   return (
     <PressableLink href={href} className={className} target={target} bg="#54b4e0" border="#58a6ca" shadows={PRIMARY_SHADOWS}>
       <span className="text-white text-[16px] font-semibold leading-[24px]">{label}</span>
@@ -78,11 +86,29 @@ export function PrimaryButton({ href, label = "See My Project", className, targe
   );
 }
 
-export function LinkedInButton({ href, label = "Contact Me via LinkedIn", className, target = "_blank" }: BtnProps) {
+export function LinkedInButton({ href, label = "Contact Me", className, target = "_blank" }: BtnProps) {
   return (
     <PressableLink href={href} className={className} target={target} bg="#ffffff" border="#cacaca" shadows={SECONDARY_SHADOWS}>
       <LinkedInIcon />
       <span className="text-[#414651] text-[16px] font-semibold leading-[24px]">{label}</span>
+    </PressableLink>
+  );
+}
+
+export function SecondaryButton({ href, label = "View All Projects", className, target }: BtnProps) {
+  return (
+    <PressableLink href={href} className={className} target={target} bg="#ffffff" border="#cacaca" shadows={SECONDARY_SHADOWS}>
+      <span className="text-[#414651] text-[16px] font-semibold leading-[24px] px-[2px]">{label}</span>
+      <ArrowRightIcon color="#414651" />
+    </PressableLink>
+  );
+}
+
+export function SecondaryBackButton({ href, label = "Back to Homepage", className, target }: BtnProps) {
+  return (
+    <PressableLink href={href} className={className} target={target} bg="#ffffff" border="#cacaca" shadows={SECONDARY_SHADOWS}>
+      <ArrowLeftIcon />
+      <span className="text-[#414651] text-[16px] font-semibold leading-[24px] px-[2px]">{label}</span>
     </PressableLink>
   );
 }

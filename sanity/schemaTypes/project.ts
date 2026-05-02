@@ -19,6 +19,23 @@ export const projectSchema = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      description: "URL identifier for the project detail page (auto-generated from name).",
+      options: {
+        source: "name",
+        maxLength: 96,
+        slugify: (input) =>
+          input
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)+/g, "")
+            .slice(0, 96),
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: "category",
       title: "Category",
       type: "string",
@@ -35,10 +52,18 @@ export const projectSchema = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Description (short)",
       type: "text",
       rows: 3,
+      description: "One-paragraph summary used on cards.",
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "longDescription",
+      title: "Long Description",
+      type: "text",
+      rows: 8,
+      description: "Detailed description shown on the project detail page. Falls back to short description if empty.",
     }),
     defineField({
       name: "tags",
@@ -49,11 +74,76 @@ export const projectSchema = defineType({
     }),
     defineField({
       name: "images",
-      title: "Project Images",
+      title: "Project Images (cards)",
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
-      description: "Min 1, up to 3. Auto-cycles every 1.5s.",
-      validation: (Rule) => Rule.required().min(1).max(3),
+      description: "Min 1, up to 15. Auto-cycles every 1.5s on cards.",
+      validation: (Rule) => Rule.required().min(1).max(15),
+    }),
+    defineField({
+      name: "gallery",
+      title: "Gallery (detail page)",
+      type: "array",
+      of: [{ type: "image", options: { hotspot: true } }],
+      description: "Large showcase images for the detail page. Falls back to card images if empty.",
+    }),
+    defineField({
+      name: "status",
+      title: "Status",
+      type: "string",
+      options: {
+        list: [
+          { title: "Design Draft", value: "Design Draft" },
+          { title: "On Dev",       value: "On Dev" },
+          { title: "Launched",     value: "Launched" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "Design Draft",
+    }),
+    defineField({
+      name: "websiteUrl",
+      title: "Website URL",
+      type: "url",
+      description: "Link shown on the 'Visit The Website' button. Hidden if empty.",
+      validation: (Rule) =>
+        Rule.uri({ scheme: ["http", "https"], allowRelative: false }),
+    }),
+    defineField({
+      name: "techStack",
+      title: "Tools & Techstacks",
+      type: "array",
+      description: "List shown in the 'Tools & Techstacks' card on the detail page.",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "category",
+              title: "Category",
+              type: "string",
+              description: "e.g. DEV, DESIGN, ANIMATION",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "name",
+              title: "Tool Name",
+              type: "string",
+              description: "e.g. Next.js, Figma, Jitter",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "icon",
+              title: "Icon",
+              type: "image",
+              description: "Optional small icon/logo for the tool.",
+            }),
+          ],
+          preview: {
+            select: { title: "name", subtitle: "category", media: "icon" },
+          },
+        },
+      ],
     }),
     defineField({
       name: "order",

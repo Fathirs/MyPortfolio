@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { SecondaryButton } from "@/components/ui/Buttons";
 import { projects as defaultProjects, categories, type Project, type Category } from "@/data/projects";
 import { toProject, type SanityProject } from "@/lib/queries";
 import { useImageCarousel } from "@/hooks/useImageCarousel";
@@ -92,6 +94,11 @@ function DesktopProjectsSection({ projects }: { projects: Project[] }) {
             <p className="text-[16px] text-[#9a9a9a] py-[40px]">No projects in this category yet.</p>
           )}
         </div>
+
+        {/* View All CTA */}
+        <ScrollReveal once threshold={0.1} delay={120}>
+          <SecondaryButton href="/projects" label="View All Projects" />
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -102,7 +109,9 @@ function DesktopProjectCard({ project }: { project: Project }) {
   const activeImg = useImageCarousel(project.images.length);
 
   return (
-    <div
+    <Link
+      href={`/projects/${project.slug}`}
+      aria-label={`View project ${project.name}`}
       className="relative flex items-stretch overflow-hidden rounded-[24px] bg-white w-full max-w-[996px] cursor-pointer"
       style={{
         padding:    "12px",
@@ -138,7 +147,7 @@ function DesktopProjectCard({ project }: { project: Project }) {
         />
         <CarouselDots count={project.images.length} active={activeImg} />
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -165,6 +174,7 @@ function MobileProjectsSection({ projects }: { projects: Project[] }) {
             <MobileProjectCard key={project.num} project={project} />
           ))}
         </div>
+        <SecondaryButton href="/projects" label="View All Projects" className="w-full justify-center" />
       </div>
     </section>
   );
@@ -174,7 +184,9 @@ function MobileProjectCard({ project }: { project: Project }) {
   const activeImg = useImageCarousel(project.images.length);
 
   return (
-    <div
+    <Link
+      href={`/projects/${project.slug}`}
+      aria-label={`View project ${project.name}`}
       className="relative flex flex-col gap-[24px] overflow-hidden rounded-[24px] bg-white w-full"
       style={{ padding: "12px", border: "1px solid #d7d7d7", boxShadow: "inset 0px 0px 0px 2px white" }}
     >
@@ -193,7 +205,7 @@ function MobileProjectCard({ project }: { project: Project }) {
           ))}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
